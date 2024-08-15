@@ -1,0 +1,34 @@
+#- name: Stop Dataiku DSS Automation Node Manually
+#  shell: |
+#    bin/dss stop
+#  register: stop_dss_automation_node
+#  ignore_errors: true
+#  args:
+#    chdir: "{{ automation.data_path }}"
+#- debug: msg={{ stop_dss_automation_node }}
+#  when: print_debug == true
+
+
+- name: Disable and Stop Systemd Service for Dataiku DSS Automation Node
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: no
+    state: stopped
+  register: disable_automation_node_systemd_service
+  ignore_errors: true
+- debug: msg={{ disable_automation_node_systemd_service }}
+  when: print_debug == true
+
+
+- name: Delete Directory for Dataiku DSS Automation Node
+  become: true
+  file:
+    path: "{{ automation.data_path }}"
+    state: absent
+  register: delete_data_dir
+  ignore_errors: true
+- debug: msg={{ delete_data_dir }}
+  when: print_debug == true
+

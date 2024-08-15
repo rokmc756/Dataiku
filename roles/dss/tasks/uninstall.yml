@@ -1,0 +1,105 @@
+#
+- name: Check if MCB and SCB both are enabled to deploy in groups_vars/all.yml
+  fail: msg="Stopped due to both MCB and SCB settings enabled in groups_vars/all.yml. Please choose one of them and rerun playbook"
+  when: weka.backend.mcb == true and weka.backend.scb == true
+
+#
+- name: Copy expect script file to stop io operation
+  template: src=weka-stop-io.sh.j2 dest={{ weka.base_path }}/weka-stop-io.sh owner=root group=root mode=755 force=yes
+  when: inventory_hostname in hostvars[groups['workers'][0]]['ansible_hostname']
+
+#
+- name: Stop IO
+  shell: |
+    weka user login {{ weka.admin_user }} {{ weka.admin_change_pass }} && weka status
+    {{ weka.base_path }}/weka-stop-io.sh
+  ignore_errors: true
+  when: inventory_hostname in hostvars[groups['workers'][0]]['ansible_hostname']
+
+#
+- name: Stop and Remove MCB Containers
+  shell: |
+    weka local stop {{ item }} && weka local disable {{ item }} && weka local rm -f {{ item }}
+  register: destroy_weka_containers
+  with_items:
+    - "{{ container.frontend.name }}"
+    - "{{ container.compute.name }}"
+    - "{{ container.drives.name }}"
+    - "{{ container.default.name }}"
+  ignore_errors: true
+  when: destroy_weka == true and weka.backend.mcb == true and inventory_hostname in groups['workers']
+- debug: msg={{ destroy_weka_containers }}
+  when: inventory_hostname in groups['workers'] and print_debug == true
+  #  - "{{ container.envoy.name }}"
+
+
+- name: Stop and Remove SCB Container
+  shell: |
+    weka local stop {{ item }} && weka local disable {{ item }} && weka local rm -f {{ item }}
+  register: destroy_weka_containers
+  with_items:
+    - "{{ container.default.name }}"
+  ignore_errors: true
+  when: destroy_weka == true and weka.backend.scb == true and inventory_hostname in groups['workers']
+- debug: msg={{ destroy_weka_containers }}
+  when: inventory_hostname in groups['workers'] and print_debug == true
+  # - "default"
+
+
+- name: Destroy Weka Containers in All Hosts
+  shell: /root/tools/install/wekadestroy -f -y -u {{ ipaddr0 }}
+  register: destroy_weka_clu
+  ignore_errors: true
+  when: remove_weka_bin == true and inventory_hostname in groups['workers']
+- debug: msg={{ destroy_weka_clu }}
+  when: inventory_hostname in groups['workers'] and print_debug == true
+
+#
+- name: Delete tarball file and install directory
+  file:
+    path: "{{ item }}"
+    state: absent
+  register: delete_install_binary_dir
+  with_items:
+    - "{{ weka.base_path }}/{{ weka_file_name }}"
+    - "{{ weka.base_path }}/{{ weka_file_name }}.{{ weka.bin_type }}"
+    - "{{ weka.base_path }}/{{ weka.tools.name }}"
+    - "{{ weka.base_path }}/{{ weka_tools_file_name }}"
+    - "{{ weka.base_path }}/{{ weka_tools_file_name }}.{{ weka.tools.bin_type }}"
+  ignore_errors: true
+  when: remove_weka_bin == true and inventory_hostname in groups['workers']
+- debug: msg={{ delete_install_binary_dir }}
+  when: inventory_hostname in groups['workers'] and print_debug == true
+
+#
+- name: Unmount tmpfs
+  shell: |
+    umount /opt/weka/data/agent/tmpfss/cross-container-rpc-the-tmpfs
+  register: umount_tmpfs
+  when: destroy_weka == true and inventory_hostname in hostvars[groups['workers'][0]]['ansible_hostname']
+  ignore_errors: true
+- debug: msg={{ umount_tmpfs }}
+  when: inventory_hostname in groups['workers'] and print_debug == true
+
+#
+- name: Clear Memory Cache
+  shell: |
+    sync && echo 3 > /proc/sys/vm/drop_caches
+  register: clear_cache_memory
+  ignore_errors: true
+  when: destroy_weka == true and inventory_hostname in groups['workers']
+- debug: msg={{ clear_cache_memory }}
+  when: inventory_hostname in groups['workers'] and print_debug == true
+
+#
+#- name: Reboot required
+#  shell: ( /bin/sleep 5 ; /sbin/shutdown -r now "Ansible updates triggered" ) &
+#  async: 1200
+#  poll: 0
+#  when:  destroy_weka == true and inventory_hostname in groups['workers']
+#  notify:
+#    - Waiting for server to come back after reboot
+
+#
+#- meta: flush_handlers
+

@@ -1,0 +1,81 @@
+# Database requirements
+# Govern is based on a Postgresql 12+ database for the storage of data.
+# A dedicated database and user need to be created on the Postgresql instance for Govern:
+#
+# CREATE USER <govern_user> WITH ENCRYPTED PASSWORD '<govern_pwd>';
+# CREATE DATABASE <govern_db> OWNER <govern_user>;
+# Where <govern_user>, <govern_pwd> and <govern_db> are the values of your choice.
+
+
+- name: Create Directory for Dataiku DSS Govern Node
+  become: true
+  file:
+    path: "{{ govern.data_path }}"
+    state: directory
+    owner: jomoon
+    group: jomoon
+    mode: 0755
+  register: create_data_dir
+- debug: msg={{ create_data_dir }}
+  when: print_debug == true
+
+
+- name: Install Dataiku DSS Govern Node
+  shell: |
+    dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/installer.sh -t govern -d {{ govern.data_path }} -p {{ govern.port }} # -l LICENSE_FILE]
+  register: install_dss_govern_node
+  args:
+    chdir: "{{ dss.base_path }}"
+- debug: msg={{ install_dss_govern_node }}
+  when: print_debug == true
+
+
+- name: Enable Startup Dataiku DSS Govern Node At Boot Time
+  become: true
+  shell: |
+    dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/scripts/install/install-boot.sh {{ govern.data_path }} {{ dss.user }}
+  register: enable_startup_dss_govern_node
+  args:
+    chdir: "{{ dss.base_path }}"
+- debug: msg={{ enable_startup_dss_govern_node }}
+  when: print_debug == true
+
+
+- name: Enable and Start Systemd Service for Dataiku DSS Govern Node
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: yes
+    state: started
+  register: enable_govern_node_systemd_service
+- debug: msg={{ enable_govern_node_systemd_service }}
+  when: print_debug == true
+
+
+# - name: Start Dataiku DSS Govern Node Manually
+#  shell: |
+#    bin/dss start
+#  register: start_dss_govern_node
+#  args:
+#    chdir: "{{ govern.data_path }}"
+#- debug: msg={{ start_dss_govern_node }}
+#  when: print_debug == true
+
+
+
+# Post-installation steps
+# Before starting Govern, the Postgresql database connection needs to be setup in the settings. Edit DATA_DIR/config/dip.properties and add the connection setting there:
+#
+# psql.jdbc.url=jdbc:postgresql://<psql_host>:<psql_port>/<govern_db>?currentSchema=<govern_schema>
+# psql.jdbc.user=<govern_user>
+# psql.jdbc.password=<govern_pwd>
+# Where <govern_user>, <govern_pwd> and <govern_db> should be replaced with the value used previously to create the user and database for Govern. In case there’s a specific schema to be used for govern, it can be specified with ?currentSchema=<govern_schema>. This is optional, and this part may be removed from the URL if default schema configured in the database is to be used. <psql_host> and <psql_port> should point to a running PostgreSQL server.
+#
+# Finally, for bootstrapping the initial configuration of govern, issue the following command (only first time after kit installation):
+#
+# DATA_DIR/bin/govern-admin init-db
+# Govern can then be started with the standard command:
+#
+# DATA_DIR/bin/dss start
+

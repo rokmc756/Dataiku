@@ -1,0 +1,33 @@
+#- name: Stop Dataiku DSS Design Node Manually
+#  shell: |
+#    bin/dss stop
+#  register: stop_dss_design_node
+#  ignore_errors: true
+#  args:
+#    chdir: "{{ design.data_path }}"
+#- debug: msg={{ stop_dss_design_node }}
+#  when: print_debug == true
+
+
+- name: Disable and Stop Systemd Service for Dataiku DSS Design Node
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: no
+    state: stopped
+  register: disable_design_node_systemd_service
+- debug: msg={{ disable_design_node_systemd_service }}
+  when: print_debug == true
+
+
+- name: Delete Directory for Dataiku DSS Design Node
+  become: true
+  file:
+    path: "{{ design.data_path }}"
+    state: absent
+  register: delete_data_dir
+  ignore_errors: true
+- debug: msg={{ delete_data_dir }}
+  when: print_debug == true
+

@@ -1,0 +1,34 @@
+#- name: Stop Dataiku DSS Deployer Node Manually
+#  shell: |
+#    bin/dss stop
+#  register: stop_dss_deployer_node
+#  ignore_errors: true
+#  args:
+#    chdir: "{{ deployer.data_path }}"
+#- debug: msg={{ stop_dss_deployer_node }}
+#  when: print_debug == true
+
+
+- name: Disable and Stop Systemd Service for Dataiku DSS Deployer Node
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: no
+    state: stopped
+  register: disable_deployer_node_systemd_service
+  ignore_errors: true
+- debug: msg={{ disable_deployer_node_systemd_service }}
+  when: print_debug == true
+
+
+- name: Delete Directory for Dataiku DSS Deployer Node
+  become: true
+  file:
+    path: "{{ deployer.data_path }}"
+    state: absent
+  register: delete_data_dir
+  ignore_errors: true
+- debug: msg={{ delete_data_dir }}
+  when: print_debug == true
+

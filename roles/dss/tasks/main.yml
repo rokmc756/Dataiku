@@ -1,0 +1,84 @@
+---
+# For now fail if it's not Suppoted OS
+- name: Check Supportable OS
+  fail: msg="{{ ansible_distribution }} is not supported for this Ansible Playbook!"
+  when:
+    - ansible_distribution_major_version|int >= 8
+    - ansible_distribution != 'RedHat' or ansible_distribution != 'CentOS' or ansible_distribution != 'Rocky'
+    - inventory_hostname in groups['all']
+
+
+- name: Set Facts for Installing Dataiku DSS
+  import_tasks: set-facts.yml
+  tags:
+    - upload
+    - install
+    - uninstall
+  when: inventory_hostname in groups['all']
+
+
+- name: Upload Dataiku DSS Software Binary
+  import_tasks: upload-dss-bin.yml
+  tags: upload
+  when: inventory_hostname not in groups['fm']
+
+
+- name: Install Dataiku Design Node
+  import_tasks: install-design-node.yml
+  tags: install
+  when: install_design == true and inventory_hostname in groups['design']
+
+
+- name: Install Dataiku Deployer Node
+  import_tasks: install-deployer-node.yml
+  tags: install
+  when: install_deployer == true and inventory_hostname in groups['deployer']
+
+
+- name: Install Dataiku API Node
+  import_tasks: install-api-node.yml
+  tags: install
+  when: install_api == true and inventory_hostname in groups['api']
+
+
+- name: Install Automation Node
+  import_tasks: install-automation-node.yml
+  tags: install
+  when: install_automation == true and inventory_hostname in groups['automation']
+
+
+- name: Install Govern Node
+  import_tasks: install-govern-node.yml
+  tags: install
+  when: install_govern == true and inventory_hostname in groups['govern']
+
+
+- name: Uninstall Govern Node
+  import_tasks: uninstall-govern-node.yml
+  tags: uninstall
+  when: uninstall_govern == true and inventory_hostname in groups['govern']
+
+
+- name: Uninstall Automation Node
+  import_tasks: uninstall-automation-node.yml
+  tags: uninstall
+  when: uninstall_automation == true and inventory_hostname in groups['automation']
+
+
+- name: Uninstall Dataiku API Node
+  import_tasks: uninstall-api-node.yml
+  tags: uninstall
+  when: uninstall_api == true and inventory_hostname in groups['api']
+
+
+- name: Uninstall Dataiku Deployer Node
+  import_tasks: uninstall-deployer-node.yml
+  tags: uninstall
+  when: uninstall_deployer == true and inventory_hostname in groups['deployer']
+
+
+- name: Uninstall Dataiku Design Node
+  import_tasks: uninstall-design-node.yml
+  tags: uninstall
+  when: uninstall_design == true and inventory_hostname in groups['design']
+

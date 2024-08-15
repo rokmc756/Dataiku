@@ -1,0 +1,56 @@
+- name: Create Directory for Dataiku DSS Automation Node
+  become: true
+  file:
+    path: "{{ automation.data_path }}"
+    state: directory
+    owner: jomoon
+    group: jomoon
+    mode: 0755
+  register: create_data_dir
+- debug: msg={{ create_data_dir }}
+  when: print_debug == true
+
+
+- name: Install Dataiku DSS Automation Node
+  shell: |
+    dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/installer.sh -t automation -d {{ automation.data_path }} -p {{ automation.port }} # -l LICENSE_FILE]
+  register: install_dss_automation_node
+  args:
+    chdir: "{{ dss.base_path }}"
+- debug: msg={{ install_dss_automation_node }}
+  when: print_debug == true
+
+
+- name: Enable Startup Dataiku DSS Automation Node At Boot Time
+  become: true
+  shell: |
+    dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/scripts/install/install-boot.sh {{ automation.data_path }} {{ dss.user }}
+  register: enable_startup_dss_automation_node
+  args:
+    chdir: "{{ dss.base_path }}"
+- debug: msg={{ enable_startup_dss_automation_node }}
+  when: print_debug == true
+
+
+- name: Enable and Start Systemd Service for Dataiku DSS Automation Node
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: yes
+    state: started
+  register: enable_automation_node_systemd_service
+- debug: msg={{ enable_automation_node_systemd_service }}
+  when: print_debug == true
+
+
+# - name: Start Dataiku DSS Automation Node Manually
+#  shell: |
+#    bin/dss start
+#  register: start_dss_automation_node
+#  args:
+#    chdir: "{{ automation.data_path }}"
+#- debug: msg={{ start_dss_automation_node }}
+#  when: print_debug == true
+
+

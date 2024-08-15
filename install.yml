@@ -1,0 +1,15 @@
+- hosts: all
+  vars:
+    print_debug: true
+    install_design: false
+    install_deployer: false
+    install_api: true
+    install_automation: false
+    install_govern: false
+  roles:
+    - dss
+
+#   - fm
+#   - init-hosts
+#   - postgres
+

@@ -1,0 +1,55 @@
+- name: Create Directory for Dataiku DSS Design Node
+  become: true
+  file:
+    path: "{{ design.data_path }}"
+    state: directory
+    owner: jomoon
+    group: jomoon
+    mode: 0755
+  register: create_data_dir
+- debug: msg={{ create_data_dir }}
+  when: print_debug == true
+
+
+- name: Install Dataiku DSS Design Node
+  shell: |
+    dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/installer.sh -d {{ design.data_path }} -p {{ design.port }} # -l LICENSE_FILE]
+  register: install_dss_design_node
+  args:
+    chdir: "{{ dss.base_path }}"
+- debug: msg={{ install_dss_design_node }}
+  when: print_debug == true
+
+
+- name: Enable Startup Dataiku DSS Design Node At Boot Time
+  become: true
+  shell: |
+    dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}//scripts/install/install-boot.sh {{ design.data_path }} {{ dss.user }}
+  register: enable_startup_dss_design_node
+  args:
+    chdir: "{{ dss.base_path }}"
+- debug: msg={{ enable_startup_dss_design_node }}
+  when: print_debug == true
+
+
+- name: Enable and Start Systemd Service for Dataiku DSS Design Node
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: yes
+    state: started
+  register: enable_design_node_systemd_service
+- debug: msg={{ enable_design_node_systemd_service }}
+  when: print_debug == true
+
+
+# - name: Start Dataiku DSS Design Node Manually
+#  shell: |
+#    bin/dss start
+#  register: start_dss_design_node
+#  args:
+#    chdir: "{{ design.data_path }}"
+#- debug: msg={{ start_dss_design_node }}
+#  when: print_debug == true
+

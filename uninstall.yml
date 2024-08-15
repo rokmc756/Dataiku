@@ -1,0 +1,15 @@
+- hosts: all
+  vars:
+    print_debug: true
+    uninstall_design: false
+    uninstall_deployer: false
+    uninstall_api: true
+    uninstall_automation: false
+    uninstall_govern: false
+  roles:
+    - dss
+
+#   - fm
+#   - init-hosts
+#   - postgres
+

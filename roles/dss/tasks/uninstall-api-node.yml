@@ -1,0 +1,34 @@
+#- name: Stop Dataiku DSS API Node Manually
+#  shell: |
+#    bin/dss stop
+#  register: stop_dss_api_node
+#  ignore_errors: true
+#  args:
+#    chdir: "{{ api.data_path }}"
+#- debug: msg={{ stop_dss_api_node }}
+#  when: print_debug == true
+
+
+- name: Disable and Stop Systemd Service for Dataiku DSS API Node
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: no
+    state: stopped
+  register: disable_api_node_systemd_service
+  ignore_errors: true
+- debug: msg={{ disable_api_node_systemd_service }}
+  when: print_debug == true
+
+
+- name: Delete Directory for Dataiku DSS API Node
+  become: true
+  file:
+    path: "{{ api.data_path }}"
+    state: absent
+  register: delete_data_dir
+  ignore_errors: true
+- debug: msg={{ delete_data_dir }}
+  when: print_debug == true
+

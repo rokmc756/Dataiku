@@ -1,0 +1,20 @@
+design:
+  data_path: "/opt/dataiku/design/data"
+  port: 8081
+
+deployer:
+  data_path: "/opt/dataiku/deployer/data"
+  port: 8082
+
+api:
+  data_path: "/opt/dataiku/api/data"
+  port: 8083
+
+automation:
+  data_path: "/opt/dataiku/automation/data"
+  port: 8084
+
+govern:
+  data_path: "/opt/dataiku/govern/data"
+  port: 8085
+
