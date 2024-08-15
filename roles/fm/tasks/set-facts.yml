@@ -1,0 +1,5 @@
+
+- name: Define Fact for Dataiku Fleet Version
+  set_fact:
+    fm_file_name: "dataiku-fm-{{ fm.major_version }}.{{ fm.minor_version }}.{{ fm.patch_version }}"
+

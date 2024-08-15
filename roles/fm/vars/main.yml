@@ -1,0 +1,4 @@
+fm:
+  data_path: "/opt/dataiku/fm/data"
+  port: 8087
+

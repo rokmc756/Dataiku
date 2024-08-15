@@ -1,0 +1,36 @@
+---
+# For now fail if it's not Suppoted OS
+- name: Check Supportable OS
+  fail: msg="{{ ansible_distribution }} is not supported for this Ansible Playbook!"
+  when:
+    - ansible_distribution_major_version|int >= 8
+    - ansible_distribution != 'RedHat' or ansible_distribution != 'CentOS' or ansible_distribution != 'Rocky'
+    - inventory_hostname in groups['all']
+
+
+- name: Set Facts for Installing Dataiku DSS Fleet Manager
+  import_tasks: set-facts.yml
+  tags:
+    - upload
+    - install
+    - uninstall
+  when: inventory_hostname in groups['all']
+
+
+- name: Upload Dataiku DSS Fleet Manager Software Binary
+  import_tasks: upload-dss-fm-bin.yml
+  tags: upload
+  when: inventory_hostname not in groups['fm']
+
+
+- name: Install Dataiku Fleet Manager Node
+  import_tasks: install-fm-node.yml
+  tags: install
+  when: install_fm == true and inventory_hostname in groups['fm']
+
+
+- name: Uninstall Dataiku Fleet Manager Node
+  import_tasks: uninstall-fm-node.yml
+  tags: uninstall
+  when: uninstall_fm == true and inventory_hostname in groups['fm']
+
