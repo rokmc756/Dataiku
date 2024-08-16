@@ -10,7 +10,6 @@
 
 
 - name: Disable and Stop Systemd Service for Dataiku DSS API Node
-  become: true
   systemd:
     daemon_reload: yes
     name: dataiku
@@ -23,7 +22,6 @@
 
 
 - name: Delete Directory for Dataiku DSS API Node
-  become: true
   file:
     path: "{{ api.data_path }}"
     state: absent

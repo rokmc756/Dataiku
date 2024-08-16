@@ -17,4 +17,9 @@ automation:
 govern:
   data_path: "/opt/dataiku/govern/data"
   port: 8085
+  pgsql:
+    db_name: govern_testdb
+    db_user: govern_user
+    db_password: changeme
+
 

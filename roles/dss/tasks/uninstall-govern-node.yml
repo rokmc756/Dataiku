@@ -10,7 +10,6 @@
 
 
 - name: Disable and Stop Systemd Service for Dataiku DSS Govern Node
-  become: true
   systemd:
     daemon_reload: yes
     name: dataiku
@@ -23,7 +22,6 @@
 
 
 - name: Delete Directory for Dataiku DSS Govern Node
-  become: true
   file:
     path: "{{ govern.data_path }}"
     state: absent
@@ -31,5 +29,4 @@
   ignore_errors: true
 - debug: msg={{ delete_data_dir }}
   when: print_debug == true
-
 

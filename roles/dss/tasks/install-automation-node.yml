@@ -1,5 +1,4 @@
 - name: Create Directory for Dataiku DSS Automation Node
-  become: true
   file:
     path: "{{ automation.data_path }}"
     state: directory
@@ -12,6 +11,7 @@
 
 
 - name: Install Dataiku DSS Automation Node
+  become_user: "{{ dss.user }}"
   shell: |
     dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/installer.sh -t automation -d {{ automation.data_path }} -p {{ automation.port }} # -l LICENSE_FILE]
   register: install_dss_automation_node
@@ -22,7 +22,6 @@
 
 
 - name: Enable Startup Dataiku DSS Automation Node At Boot Time
-  become: true
   shell: |
     dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/scripts/install/install-boot.sh {{ automation.data_path }} {{ dss.user }}
   register: enable_startup_dss_automation_node
@@ -33,7 +32,6 @@
 
 
 - name: Enable and Start Systemd Service for Dataiku DSS Automation Node
-  become: true
   systemd:
     daemon_reload: yes
     name: dataiku
@@ -52,5 +50,3 @@
 #    chdir: "{{ automation.data_path }}"
 #- debug: msg={{ start_dss_automation_node }}
 #  when: print_debug == true
-
-

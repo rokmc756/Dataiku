@@ -1,15 +1,15 @@
 - hosts: all
+  become: true
   vars:
     print_debug: true
-    uninstall_design: false
-    uninstall_deployer: false
-    uninstall_api: true
-    uninstall_automation: false
-    uninstall_govern: false
+    uninstall_design: true
+    uninstall_deployer: true
+    uninstall_api: false
+    uninstall_automation: true
+    uninstall_govern: true
   roles:
-    - dss
-
+   - dss
+   - postgres
 #   - fm
 #   - init-hosts
-#   - postgres
 

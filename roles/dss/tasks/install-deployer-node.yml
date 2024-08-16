@@ -1,5 +1,4 @@
 - name: Create Directory for Dataiku DSS Deployer Node
-  become: true
   file:
     path: "{{ deployer.data_path }}"
     state: directory
@@ -12,6 +11,7 @@
 
 
 - name: Install Dataiku DSS Deployer Node
+  become_user: "{{ dss.user }}"
   shell: |
     dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/installer.sh -t deployer -d {{ deployer.data_path }} -p {{ deployer.port }} # -l LICENSE_FILE]
   register: install_dss_deployer_node
@@ -22,7 +22,6 @@
 
 
 - name: Enable Startup Dataiku DSS Deployer Node At Boot Time
-  become: true
   shell: |
     dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}/scripts/install/install-boot.sh {{ deployer.data_path }} {{ dss.user }}
   register: enable_startup_dss_deployer_node
@@ -33,7 +32,6 @@
 
 
 - name: Enable and Start Systemd Service for Dataiku DSS Deployer Node
-  become: true
   systemd:
     daemon_reload: yes
     name: dataiku

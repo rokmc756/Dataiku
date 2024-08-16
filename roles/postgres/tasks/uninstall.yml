@@ -1,21 +1,21 @@
-# Destroy VMWare Postgres Database
+# Destroy Postgres Database
 #
-#- name: Stop systemd service of VMware Postgres
-#  systemd:
-#    name: postgres
-#    state: stopped
-#    daemon_reload: yes
-#  register: pgautofailover_service_stopped
-#  async: 60
-#  poll: 5
+- name: Stop systemd service of PostgreSQL
+  systemd:
+    name: postgresql
+    state: stopped
+    daemon_reload: yes
+  register: stop_postgresql_service
+  async: 60
+  poll: 5
 
 
-- name: Kill all postgres processes
-  shell: ( killall postgres )
-  ignore_errors: true
-  register: postgres_process_killed
+#- name: Kill all postgres processes
+#  shell: ( killall postgres )
+#  ignore_errors: true
+#  register: postgres_process_killed
 
-#
+
 #- name: Delete configuration files and data directory
 #  file:
 #    path: "{{ item }}"
@@ -30,38 +30,43 @@
 #    # - "/var/lib/pgsql"
 #    # - "/home/postgres"
 
-#
-- name: Uninstall VMware Postgres rpm package
+
+#   name: "{{ pgsql_pkg_name }}"
+- name: Uninstall Postgres Packages
   package:
-    name: "{{ pgsql_pkg_name }}"
+    name: "{{ item }}"
     state: absent
     disable_gpg_check: true
+  with_items:
+    - postgresql
+    - postgresql-server
   vars:
     ansible_python_interpreter: "{{ yum_python_version }}"
 
-#
-- name: Delete VMware Postgres RPM Package file
-  file:
-    path: "{{ common.sudo_user_home_dir }}/{{ pgsql_pkg_name }}.{{ pgsql.arch_type }}.{{ pgsql.bin_type }}"
-    state: absent
 
-#
-- name: Delete configuration files and data directory for VMware Postgres
+#- name: Delete Postgres RPM Package file
+#  file:
+#    path: "{{ common.sudo_user_home_dir }}/{{ pgsql_pkg_name }}.{{ pgsql.arch_type }}.{{ pgsql.bin_type }}"
+#    state: absent
+
+
+- name: Delete Configuration Files and Data Directory for PostgreSQL
   file:
     path: "{{ item }}"
     state: absent
   register: postgres_config_files_deleted
   with_items: "{{ delete_file_list }}"
 
-#
-- name: Uninstall Prerequesties RPM Packages for VMware Postgres
+
+- name: Uninstall Prerequesties RPM Packages for Postgres
   package:
     name: "{{ rh_uninstall_pkgs }}"
     state: absent
     skip_broken: yes
   vars:
     ansible_python_interpreter: "{{ yum_python_version }}"
-#
+
+
 - name: Reload systemd daemon
   systemd:
     daemon_reload: yes
@@ -69,14 +74,14 @@
   async: 60
   poll: 5
 
-#
+
 - name: Stop and disable firewalld
   service:
     name: firewalld
     state: stopped
     enabled: false
 
-#
+
 - name: Reload systemd daemon
   systemd:
     daemon_reload: yes
@@ -84,21 +89,21 @@
   async: 60
   poll: 5
 
-#
+
 - name: Flush iptables rules
   shell: ( iptables -F )
   register: iptables_rules_flushed
 
-#
+
 - name: List iptables rules
   shell: ( iptables -nL )
   register: iptables_rules_listed
 
-#
+
 - debug: msg={{ iptables_rules_listed.stdout }}
   tags:  print_debug
 
-#
+
 - name: Alternative Python Version
   shell: |
     /usr/sbin/update-alternatives --install /usr/bin/python python {{ yum_python_version }} 1

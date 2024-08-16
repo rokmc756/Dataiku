@@ -1,15 +1,15 @@
 - hosts: all
+  become: true
   vars:
     print_debug: true
-    install_design: false
-    install_deployer: false
-    install_api: true
-    install_automation: false
-    install_govern: false
+    install_design: true
+    install_deployer: true
+    install_api: false
+    install_automation: true
+    install_govern: true
   roles:
-    - dss
-
+   - postgres
+   - dss
 #   - fm
 #   - init-hosts
-#   - postgres
 

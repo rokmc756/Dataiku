@@ -10,7 +10,6 @@
 
 
 - name: Disable and Stop Systemd Service for Dataiku DSS Design Node
-  become: true
   systemd:
     daemon_reload: yes
     name: dataiku
@@ -22,7 +21,6 @@
 
 
 - name: Delete Directory for Dataiku DSS Design Node
-  become: true
   file:
     path: "{{ design.data_path }}"
     state: absent

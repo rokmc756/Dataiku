@@ -1,33 +1,58 @@
 ---
-# Install Sinlge VMware Postgres Database
-#
-- name: Initialize VMware Postgres Database instance
+# Install Sinlge Postgres Database
+
+#- name: Initialize Postgres Database Instance
+#  become_user: postgres
+#  shell: ( source {{ pgsql.base_dir }}/.bash_profile ; {{ common.pgsql_bin_dir }}/initdb -D {{ pgsql.base_dir }}/data )
+#  register: postgres_instance_initialized
+#  args:
+#    chdir: "{{ pgsql.base_dir }}"
+#    executable: /bin/bash
+
+
+#- name: Create a Single Non-HA Postgres Database Server
+#  become_user: postgres
+#  shell: ( source {{ pgsql.base_dir }}/.bash_profile ; {{ common.pgsql_bin_dir }}/postgres -D {{ pgsql.base_dir }}/data > {{ pgsql.base_dir }}/logfile 2>&1 & )
+#  register: postgres_instance_created
+#  args:
+#    chdir: "{{ pgsql.base_dir }}"
+#    executable: /bin/bash
+
+
+- name: Initialize Postgres Database Instance
+  become: true
   become_user: postgres
-  shell: ( source {{ pgsql.base_dir }}/.bash_profile ; {{ common.pgsql_bin_dir }}/initdb -D {{ pgsql.base_dir }}/data )
+  shell: |
+    /usr/bin/postgresql-setup --initdb
   register: postgres_instance_initialized
   args:
     chdir: "{{ pgsql.base_dir }}"
     executable: /bin/bash
 
-#
-- name: Create a single non-HA VMware Postgres Database Server
-  become_user: postgres
-  shell: ( source {{ pgsql.base_dir }}/.bash_profile ; {{ common.pgsql_bin_dir }}/postgres -D {{ pgsql.base_dir }}/data > {{ pgsql.base_dir }}/logfile 2>&1 & )
-  register: postgres_instance_created
-  args:
-    chdir: "{{ pgsql.base_dir }}"
-    executable: /bin/bash
 
-#
-- name: Verify that the psql of VMware Postgres is installed properly
+# Enable and Start services for patroni
+- name: Reload and start systemd service of PostgreSQL
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: postgresql
+    enabled: yes
+    state: started
+  register: postgresql_systemd_service_reloaded
+
+
+- name: Verify that the psql of Postgres is Installed Properly
+  become: true
   become_user: postgres
-  shell: ( source {{ pgsql.base_dir }}/.bash_profile ; {{ common.pgsql_bin_dir }}/psql -c "select version()" )
+  shell: |
+    {{ common.pgsql_bin_dir }}/psql -c "select version()"
   register: postgres_install_verified
   args:
     chdir: "{{ pgsql.base_dir }}"
     executable: /bin/bash
 
-- name: Verify that the pg_ctl of VMware Postgres is installed properly
+
+- name: Verify that the pg_ctl of Postgres is Installed Properly
   become_user: postgres
   shell: ( source {{ pgsql.base_dir }}/.bash_profile ; {{ common.pgsql_bin_dir }}/pg_ctl -V )
   register: pg_ctl_install_verified
@@ -35,18 +60,18 @@
     chdir: "{{ pgsql.base_dir }}"
     executable: /bin/bash
 
-#
-- name: Insert the line of executable binary path into .bashrc for VMware Postgres {{ pgsql.major_version }}
+
+- name: Insert the line of executable binary path into .bashrc for Postgres {{ pgsql.major_version }}
   become_user: postgres
   lineinfile:
     path: "{{ item }}"
     line: "export PATH={{ common.pgsql_bin_dir }}:$PATH"
   with_items:
     - "{{ pgsql.base_dir }}/.bash_profile"
-    - "{{ pgsql.home_dir }}/.bash_profile"
+  #  - "{{ pgsql.home_dir }}/.bash_profile"
 
-#
-- name: Grant user access from network access for access with cert authentication
+
+- name: Grant User Access from Network Access for Access with Cert Authentication
   become_user: postgres
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
@@ -58,8 +83,8 @@
     databases: all
     method: trust
 
-#
-- name: Replace database directory
+
+- name: Replace Database Directory
   become_user: postgres
   replace:
     path: "{{ pgsql.base_dir }}/.bash_profile"
@@ -67,14 +92,14 @@
     replace: 'PGDATA=/{{ pgsql.base_dir }}/data'
     backup: yes
 
-#
+
 #- name: Verify the current state of postgres instance
 #  become_user: postgres
 #  shell: ( ps -ef | grep postgres )
 #  register: postgres_instance_state_verified
-#
-#
-#- name: Verify the current state of postgres
+
+
+#- name: Verify the current state of Postgres
 #  become_user: postgres
 #  shell: ( source {{ pgsql.base_dir }}/.bash_profile ; {{ common.pgsql_bin_dir }}/psql -c "\l" )
 #  register: postgres_state_verified
@@ -82,16 +107,16 @@
 #    chdir: "{{ pgsql.base_dir }}"
 #    executable: /bin/bash
 
-#
+
 #- debug: msg={{ postgres_state_verified }}
 #  tags: print_debug
 
-#
+
 #- name: Copy systemd configuration of postgres into /etc/systemd/system
 #  template: src=postgres.systemd.j2 dest=/etc/systemd/system/postgres.service owner=root group=root mode=644 force=yes
 #  register: postgres_systemd_config_copied
 
-#
+
 #- name: Change the Permissions on the database directory in {{ pgsql.base_dir }} directory
 #  become_user: postgres
 #  file:
@@ -104,7 +129,7 @@
 #    - "data"
 #  when: pgsql.major_version|int >= 11
 
-#
+
 #- name: Change the Permissions on the database directory in {{ pgsql.base_dir }} directory
 #  become_user: postgres
 #  file:
@@ -117,7 +142,7 @@
 #    - "data"
 #  when: pgsql.major_version|int < 11
 
-#
+
 #- name: Change the permissions on the /tmp directory
 #  file:
 #    path: /tmp
@@ -125,23 +150,22 @@
 #    mode: 0777
 #  register: tmp_dir_permission_changed
 
-# Enable and Start services for patroni
-#- name: Reload and start systemd service of VMware Postgres
-#  systemd:
-#    daemon_reload: yes
-#    name: postgres
-#    enabled: yes
-#    state: started
-#  register: postgres_systemd_service_reloaded
 
-#
-- name: Verify the current state of postgres instance
+# Enable and Restart services for PostgreSQL
+#- name: Restart Systemd Service of PostgreSQL
+#  systemd:
+#    name: postgresql
+#    state: restarted
+#  register: restart_postgresql_systemd_service
+
+
+- name: Verify the current state of Postgres Instance
   become_user: postgres
   shell: ( ps -ef | grep postgres )
   register: postgres_instance_state_verified
 
-#
-- name: Verify the current state of postgres
+
+- name: Verify the current state of Postgres
   become_user: postgres
   shell: ( source {{ pgsql.base_dir }}/.bash_profile ; {{ common.pgsql_bin_dir }}/psql -c "\l" )
   register: postgres_state_verified
@@ -149,7 +173,7 @@
     chdir: "{{ pgsql.base_dir }}"
     executable: /bin/bash
 
-#
+
 - debug: msg={{ postgres_state_verified }}
   tags: print_debug
 

@@ -3,3 +3,8 @@
   set_fact:
     dss_file_name: "dataiku-dss-{{ dss.major_version }}.{{ dss.minor_version }}.{{ dss.patch_version }}"
 
+
+#- name: Define Fact of Network Address
+#  set_fact:
+#    dataiku_network_range: "{{ hostvars[inventory_hostname]['ansible_'~ netdev0]['ipv4']['network'] }}/{{ ( hostvars[inventory_hostname]['ansible_'~ netdev0]['ipv4']['address'] + '/' + hostvars[inventory_hostname]['ansible_'~ netdev0]['ipv4']['netmask'] ) | ansible.utils.ipaddr('prefix') }}"
+

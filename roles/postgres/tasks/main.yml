@@ -1,50 +1,64 @@
 ---
-# Install Single VMWare Postgres
+# Install Single Postgres Database
 #
 # for now fail if it's not a Red Hat based system
 - name: Check OS ( GPDB )
   fail: msg="Not a Red Hat based system!"
   when: ansible_os_family != 'RedHat' or ansible_os_family != 'CentOS' or  ansible_os_family != 'Rocky'
 
-#
+
 - name: Set facts for package name and list and network range
   import_tasks: set-facts.yml
   tags:
     - install
     - uninstall
+  when: inventory_hostname in groups['postgres']
 
-#
+
 - name: Enable firewall
   import_tasks: enable-firewall.yml
   tags: install
+  when: inventory_hostname in groups['postgres']
 
-#
-- name: Install Common Prerequisties and VMware Postgres RPM Packages For Single Instance
+
+- name: Install Common Prerequisties and Postgres RPM Packages For Single Instance
   import_tasks: install-pkgs.yml
   tags: install
+  when: inventory_hostname in groups['postgres']
 
-#
-- name: Initialize VMware Postgres Instance
+
+- name: Initialize Postgres Instance
   import_tasks: initialize-postgres.yml
   tags: install
+  when: inventory_hostname in groups['postgres']
 
-#
-- name: Enable SSL for Single VMware Postgres
+
+- name: Enable SSL for Single Postgres
   import_tasks: enable-ssl.yml
   tags: install
-  when: enable_ssl == true
+  when: ssl.enable == true and inventory_hostname in groups['postgres']
 
-#
-- name: Check the status of Single VMware Postgres
+
+- name: Add User into PstgreSQL for Dataiku DSS Govern User
+  import_tasks: add-govern-users.yml
+  tags: install
+  when: inventory_hostname in groups['postgres']
+
+
+- name: Check the status of Single Postgres
   import_tasks: check-status.yml
   tags: install
+  when: inventory_hostname in groups['postgres']
 
-#
-- name: Uninstall RPM Packages for Single VMware Postgres
+
+- name: Uninstall RPM Packages for Single Postgres
   import_tasks: uninstall.yml
   tags: uninstall
+  when: inventory_hostname in groups['postgres']
 
-#
-- name: Upgrade RPM Packages for Single VMware Postgres
+
+- name: Upgrade RPM Packages for Single Postgres
   import_tasks: upgrade.yml
   tags: upgrade
+  when: inventory_hostname in groups['postgres']
+
