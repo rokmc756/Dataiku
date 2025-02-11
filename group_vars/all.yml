@@ -1,0 +1,75 @@
+ansible_ssh_pass: "changeme"
+ansible_become_pass: "changeme"
+
+
+_dss:
+  user: jomoon
+  group: jomoon
+  domain: "jtest.dataiku.com"
+  major_version: "13"
+  minor_version: "3"
+  patch_version: "2"
+  build_version: ""
+  base_path: "/home/jomoon"
+  bin_type: "tar.gz"
+  download: false
+  download_url: "https://cdn.downloads.dataiku.com/public/dss"
+  net:
+    type: "virtual"                # Or Physical
+    gateway: "192.168.2.1"
+    ipaddr0: "192.168.0.19"
+    ipaddr1: "192.168.1.19"
+    ipaddr2: "192.168.2.19"
+  vms:
+    rk9: [ "rk9-freeipa", "rk9-node01", "rk9-node02", "rk9-node03", "rk9-node04", "rk9-node05", "rk9-node06", "rk9-node07" ]
+    ubt24: [ "rk9-freeipa", "ubt24-node01", "ubt24-node02", "ubt24-node03", "ubt24-node04", "ubt24-node05", "ubt24-node06", "ubt24-node07" ]
+  debug_opt: ""  # --debug
+
+
+
+_fm:
+  user: jomoon
+  group: jomoon
+  domain: "jtest.dataiku.com"
+  major_version: "13"
+  minor_version: "3"
+  patch_version: "2"
+  build_version: ""
+  base_path: "/home/jomoon"
+  bin_type: "tar.gz"
+  download: false
+  download_url: "https://cdn.downloads.dataiku.com/public/fm"
+  # https://cdn.downloads.dataiku.com/public/fm/13.3.2/dataiku-fm-13.3.2.tar.gz
+  net:
+    type: "virtual"                # Or Physical
+    gateway: "192.168.2.1"
+    ipaddr0: "192.168.0.19"
+    ipaddr1: "192.168.1.19"
+    ipaddr2: "192.168.2.19"
+  vms:
+    rk9: [ "rk9-freeipa", "rk9-node01", "rk9-node02", "rk9-node03", "rk9-node04", "rk9-node05", "rk9-node06", "rk9-node07" ]
+    ubt24: [ "rk9-freeipa", "ubt24-node01", "ubt24-node02", "ubt24-node03", "ubt24-node04", "ubt24-node05", "ubt24-node06", "ubt24-node07" ]
+  debug_opt: ""  # --debug
+
+
+
+_postgres:
+  net:
+    type: "virtual"                # Or Physical
+    gateway: "192.168.0.1"
+    ipaddr0: "192.168.0.19"
+    ipaddr1: "192.168.1.19"
+    ipaddr2: "192.168.2.19"
+
+
+_vmware:
+  esxi_hostname: "192.168.0.231"
+  esxi_username: "root"
+  esxi_password: "Changeme34#$"
+
+
+_kvm:
+  hostname: "192.168.0.101"
+  username: "root"
+  password: "changeme"
+

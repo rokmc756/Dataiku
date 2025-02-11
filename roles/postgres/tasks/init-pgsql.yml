@@ -1,0 +1,176 @@
+---
+# Install Sinlge Postgres Database
+
+#- name: Initialize Postgres Database Instance
+#  become_user: postgres
+#  shell: ( source {{ _pgsql.base_dir }}/.bash_profile ; {{ _common.pgsql_bin_dir }}/initdb -D {{ _pgsql.base_dir }}/data )
+#  register: postgres_instance_initialized
+#  args:
+#    chdir: "{{ _pgsql.base_dir }}"
+#    executable: /bin/bash
+
+
+#- name: Create a Single Non-HA Postgres Database Server
+#  become_user: postgres
+#  shell: ( source {{ _pgsql.base_dir }}/.bash_profile ; {{ _common.pgsql_bin_dir }}/postgres -D {{ _pgsql.base_dir }}/data > {{ _pgsql.base_dir }}/logfile 2>&1 & )
+#  register: postgres_instance_created
+#  args:
+#    chdir: "{{ _pgsql.base_dir }}"
+#    executable: /bin/bash
+
+
+- name: Initialize Postgres Database Instance
+  become_user: postgres
+  shell: |
+    /usr/bin/postgresql-setup --initdb
+  register: postgres_instance_initialized
+  args:
+    chdir: "{{ _pgsql.base_dir }}"
+    executable: /bin/bash
+
+
+# Enable and Start services for patroni
+- name: Reload and start systemd service of PostgreSQL
+  systemd:
+    daemon_reload: yes
+    name: postgresql
+    enabled: yes
+    state: started
+  register: postgresql_systemd_service_reloaded
+
+
+- name: Verify that the psql of Postgres is Installed Properly
+  become_user: postgres
+  shell: |
+    {{ _common.pgsql_bin_dir }}/psql -c "select version()"
+  register: postgres_install_verified
+  args:
+    chdir: "{{ _pgsql.base_dir }}"
+    executable: /bin/bash
+
+
+- name: Verify that the pg_ctl of Postgres is Installed Properly
+  become_user: postgres
+  shell: ( source {{ _pgsql.base_dir }}/.bash_profile ; {{ _common.pgsql_bin_dir }}/pg_ctl -V )
+  register: pg_ctl_install_verified
+  args:
+    chdir: "{{ _pgsql.base_dir }}"
+    executable: /bin/bash
+
+
+- name: Insert the line of executable binary path into .bashrc for Postgres {{ _pgsql.major_version }}
+  become_user: postgres
+  lineinfile:
+    path: "{{ item }}"
+    line: "export PATH={{ _common.pgsql_bin_dir }}:$PATH"
+  with_items:
+    - "{{ _pgsql.base_dir }}/.bash_profile"
+  #  - "{{ pgsql.home_dir }}/.bash_profile"
+
+
+- name: Grant User Access from Network Access for Access with Cert Authentication
+  become_user: postgres
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+  postgresql_pg_hba:
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    contype: host
+    users: all
+    source: "{{ pgsql_network_range }}"
+    databases: all
+    method: trust
+
+
+- name: Replace Database Directory
+  become_user: postgres
+  replace:
+    path: "{{ _pgsql.base_dir }}/.bash_profile"
+    regexp: '^(.*)PGDATA=(.*)$'
+    replace: 'PGDATA=/{{ _pgsql.base_dir }}/data'
+    backup: yes
+
+
+#- name: Verify the current state of postgres instance
+#  become_user: postgres
+#  shell: ( ps -ef | grep postgres )
+#  register: verify_postgres_instance_state
+
+
+#- name: Verify the current state of Postgres
+#  become_user: postgres
+#  shell: ( source {{ _pgsql.base_dir }}/.bash_profile ; {{ _common.pgsql_bin_dir }}/psql -c "\l" )
+#  register: verify_postgres_state
+#  args:
+#    chdir: "{{ _pgsql.base_dir }}"
+#    executable: /bin/bash
+
+
+#- debug: msg={{ verify_postgres_state }}
+#  tags: print_debug
+
+
+#- name: Copy systemd configuration of postgres into /etc/systemd/system
+#  template: src=postgres.systemd.j2 dest=/etc/systemd/system/postgres.service owner=root group=root mode=644 force=yes
+#  register: postgres_systemd_config_copied
+
+
+#- name: Change the Permissions on the database directory in {{ _pgsql.base_dir }} directory
+#  become_user: postgres
+#  file:
+#    path: "{{ _pgsql.base_dir }}/{{ item }}"
+#    state: directory
+#    mode: 0750
+#  register: change_data_directories_permission
+#  with_items:
+#    - "backups"
+#    - "data"
+#  when: _pgsql.major_version|int >= 11
+
+
+#- name: Change the Permissions on the database directory in {{ pgsql.base_dir }} directory
+#  become_user: postgres
+#  file:
+#    path: "{{ _pgsql.base_dir }}/{{ item }}"
+#    state: directory
+#    mode: 0700
+#  register: change_data_directories_permission
+#  with_items:
+#    - "backups"
+#    - "data"
+#  when: _pgsql.major_version|int < 11
+
+
+#- name: Change the permissions on the /tmp directory
+#  file:
+#    path: /tmp
+#    state: directory
+#    mode: 0777
+#  register: change_tmp_dir_permission
+
+
+# Enable and Restart services for PostgreSQL
+#- name: Restart Systemd Service of PostgreSQL
+#  systemd:
+#    name: postgresql
+#    state: restarted
+#  register: restart_postgresql_systemd_service
+
+
+- name: Verify the current state of Postgres Instance
+  become_user: postgres
+  shell: ( ps -ef | grep postgres )
+  register: verify_postgres_instance_state
+
+
+- name: Verify the current state of Postgres
+  become_user: postgres
+  shell: ( source {{ _pgsql.base_dir }}/.bash_profile ; {{ _common.pgsql_bin_dir }}/psql -c "\l" )
+  register: verify_postgres_state
+  args:
+    chdir: "{{ _pgsql.base_dir }}"
+    executable: /bin/bash
+
+
+- debug: msg={{ verify_postgres_state }}
+  tags: print_debug
+

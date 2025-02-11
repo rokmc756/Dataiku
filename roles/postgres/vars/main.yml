@@ -1,0 +1,46 @@
+_pgsql:
+  major_version: 15
+  minor_version: 5
+  patch_version: 1
+  build_version: 1
+  os_version: el9
+  arch_type: x86_64
+  bin_type: rpm
+  db_name: single_testdb
+  db_user: jomoon
+  db_password: changeme
+  user: postgres
+  group: postgres
+  home_dir: "/home/postgres"
+  base_dir: "/var/lib/pgsql"
+
+
+_common:
+  sudo_user: jomoon
+  sudo_group: jomoon
+  sudo_user_home_dir: "/home/jomoon"
+  pgsql_pkg_name: "postgres{{ _pgsql.major_version }}"
+  pgsql_bin_dir: "/usr/bin"
+
+
+_ssl:
+  ssl_dir: "{{ _pgsql.base_dir }}/certs"
+  ssl_days: 3660
+  ssl_country: "KR"
+  ssl_state: "Seoul"
+  ssl_location: "Guro"
+  ssl_organization: "Dataiku"
+  ssl_organization_unit: "GSS"
+  ssl_common_name: "jtest.dataiku.com"
+  ssl_email: "jomoon@dataiku.com"
+  enable: true
+
+
+_govern:
+  data_path: "/opt/dataiku/govern/data"
+  port: 8085
+  pgsql:
+    db_name: govern_testdb
+    db_user: govern_user
+    db_password: changeme
+

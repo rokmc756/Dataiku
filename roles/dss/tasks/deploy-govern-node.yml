@@ -1,0 +1,74 @@
+---
+- name: Create Directory for Dataiku DSS Govern Node
+  file:
+    path: "{{ _govern.data_path }}"
+    state: directory
+    owner: "{{ _dss.user }}"
+    group: "{{ _dss.group }}"
+    mode: 0755
+  register: create_data_dir
+- debug: msg={{ create_data_dir }}
+  when: print_debug == true
+
+
+- name: Install Dataiku DSS Govern Node
+  become_user: "{{ _dss.user }}"
+  shell: |
+    dataiku-dss-{{ _dss.major_version }}.{{ _dss.minor_version }}.{{ _dss.patch_version }}/installer.sh \
+    -t govern -d {{ _govern.data_path }} -p {{ _govern.port }}
+  register: install_dss_govern_node
+  args:
+    chdir: "{{ _dss.base_path }}"
+- debug: msg={{ install_dss_govern_node }}
+  when: print_debug == true
+  # -l LICENSE_FILE]
+
+
+- name: Setup PostgreSQL Database Connection
+  become_user: "{{ _dss.user }}"
+  lineinfile:
+    dest: "{{ _govern.data_path }}/config/dip.properties"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: "{{ item.state }}"
+    backrefs: "{{ item.backrefs }}"
+  register: setup_pgsql_db_connection
+  with_items:
+    - { regexp: "^psql.jdbc.url=", line: "psql.jdbc.url=jdbc:postgresql://{{ groups['postgres'][0] }}:5432/{{ _govern.pgsql.db_name }}", state: present, backrefs: no }
+    - { regexp: "^psql.jdbc.user=", line: "psql.jdbc.user={{ _govern.pgsql.db_user }}", state: present, backrefs: yes }
+    - { regexp: "^psql.jdbc.password", line: "psql.jdbc.password={{ _govern.pgsql.db_password }}", state: present, backrefs: yes }
+- debug: msg={{ setup_pgsql_db_connection }}
+  when: print_debug == true
+
+
+- name: Issue Bootstrapping the Initial Configuration of Govern
+  become_user: "{{ _dss.user }}"
+  shell: |
+    bin/govern-admin init-db
+  register: issue_initial_config
+  args:
+    chdir: "{{ _govern.data_path }}"
+- debug: msg={{ issue_initial_config }}
+  when: print_debug == true
+
+
+- name: Enable Startup Dataiku DSS Govern Node At Boot Time
+  shell: |
+    dataiku-dss-{{ _dss.major_version }}.{{ _dss.minor_version }}.{{ _dss.patch_version }}/scripts/install/install-boot.sh {{ _govern.data_path }} {{ _dss.user }}
+  register: enable_startup_dss_govern_node
+  args:
+    chdir: "{{ _dss.base_path }}"
+- debug: msg={{ enable_startup_dss_govern_node }}
+  when: print_debug == true
+
+
+- name: Enable and Start Systemd Service for Dataiku DSS Govern Node
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: yes
+    state: started
+  register: enable_govern_node_systemd_service
+- debug: msg={{ enable_govern_node_systemd_service }}
+  when: print_debug == true
+

@@ -1,0 +1,91 @@
+---
+- name: Check Supportable OS
+  fail: msg="{{ ansible_distribution }} is not supported for this Ansible Playbook!"
+  when:
+    - ansible_distribution_major_version|int >= 8
+    - ansible_distribution != 'RedHat' or ansible_distribution != 'CentOS' or ansible_distribution != 'Rocky'
+    - inventory_hostname in groups['all']
+
+
+- name: Set Facts for Installing Dataiku DSS
+  import_tasks: set-facts.yml
+  tags: upload, deploy, destroy, install, uninstall, setup, remove
+
+
+- name: Upload Dataiku DSS Software Binary
+  import_tasks: upload-dss-bin.yml
+  tags: upload, install
+  when: ( bin is defined and bin == true )
+
+
+- name: Setup Dependent Pip Modules
+  import_tasks: setup-deps-pip.yml
+  tags: setup, install
+  when: ( pip is defined and pip == true )
+
+
+- name: Remove Dependent Pip Modules
+  import_tasks: remove-deps-pip.yml
+  tags: remove, uninstall
+  when: ( pip is defined and pip == true )
+
+
+- name: Deploy Dataiku Design Node
+  import_tasks: deploy-design-node.yml
+  tags: deploy, setup, install
+  when: ( design is defined and design == true ) and inventory_hostname in groups['design']
+
+
+- name: Deploy Dataiku Deployer Node
+  import_tasks: deploy-deployer-node.yml
+  tags: deploy, setup, install
+  when: ( deployer is defined and deployer == true ) and inventory_hostname in groups['deployer']
+
+
+- name: Deploy Dataiku API Node
+  import_tasks: deploy-api-node.yml
+  tags: deploy, setup, install
+  when: ( api is defined and api == true ) and inventory_hostname in groups['api']
+
+
+- name: Deploy Automation Node
+  import_tasks: deploy-automation-node.yml
+  tags: deploy, setup, install
+  when: ( automation is defined and automation == true ) and inventory_hostname in groups['automation']
+
+
+- name: Deploy Govern Node
+  import_tasks: deploy-govern-node.yml
+  tags: deploy, setup, install
+  when: ( govern is defined and govern == true ) and inventory_hostname in groups['govern']
+
+
+- name: Destroy Govern Node
+  import_tasks: destroy-govern-node.yml
+  tags: destroy, remove, uninstall
+  when: ( govern is defined and govern == true ) and inventory_hostname in groups['govern']
+
+
+- name: Destroy Automation Node
+  import_tasks: destroy-automation-node.yml
+  tags: destroy, remove, uninstall
+  when: ( automation is defined and automation == true ) and inventory_hostname in groups['automation']
+
+
+- name: Destroy Dataiku API Node
+  import_tasks: destroy-api-node.yml
+  tags: destroy, remove, uninstall
+  when: ( api is defined and api == true ) and inventory_hostname in groups['api']
+
+
+- name: Destroy Dataiku Deployer Node
+  import_tasks: destroy-deployer-node.yml
+  tags: destroy, remove, uninstall
+  when: ( deployer is defined and deployer == true ) and inventory_hostname in groups['deployer']
+
+
+- name: Destroy Dataiku Design Node
+  import_tasks: destroy-design-node.yml
+  tags: destroy, remove, uninstall
+  when: ( design is defined and design == true ) and inventory_hostname in groups['design']
+

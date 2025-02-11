@@ -1,0 +1,6 @@
+---
+- name: Define Fact for Dataiku DSS Version
+  set_fact:
+    dss_file_name: "dataiku-dss-{{ _dss.major_version }}.{{ _dss.minor_version }}.{{ _dss.patch_version }}"
+    dss_version: "{{ _dss.major_version }}.{{ _dss.minor_version }}.{{ _dss.patch_version }}"
+

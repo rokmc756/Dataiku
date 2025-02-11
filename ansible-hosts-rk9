@@ -1,0 +1,34 @@
+[all:vars]
+ssh_key_filename="id_rsa"
+remote_machine_username="jomoon"
+remote_machine_password="changeme"
+ansible_python_interpreter=/usr/bin/python3
+
+
+[design]
+rk9-node01 ansible_ssh_host=192.168.2.191
+
+
+[deployer]
+rk9-node02 ansible_ssh_host=192.168.2.192
+
+
+[api]
+rk9-node03 ansible_ssh_host=192.168.2.193
+
+
+[automation]
+rk9-node04 ansible_ssh_host=192.168.2.194
+
+
+[govern]
+rk9-node05 ansible_ssh_host=192.168.2.195
+
+
+[postgres]
+rk9-node06 ansible_ssh_host=192.168.2.196
+
+
+[fm]
+rk9-node07 ansible_ssh_host=192.168.2.197
+

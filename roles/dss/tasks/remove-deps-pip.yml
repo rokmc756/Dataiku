@@ -1,0 +1,28 @@
+---
+- name: Uninstall Virtual Environment
+  become_user: "{{ _dss.user }}"
+  shell: |
+    pip3 uninstall virtualenv
+  register: uninstall_virtual_environment
+  args:
+    executable: /bin/bash
+    chdir: "{{ _dss.base_path }}"
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+- debug: msg={{ uninstall_virtual_environment }}
+  when: print_debug == true
+
+
+- name: Uninstall Python Setup Tools Version for Virtual Environment
+  become_user: "{{ _dss.user }}"
+  shell: |
+    pip3 uninstall setuptools -y
+  register: uninstall_python_setup_tools_version
+  args:
+    executable: /bin/bash
+    chdir: "{{ _dss.base_path }}"
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+- debug: msg={{ uninstall_python_setup_tools_version }}
+  when: print_debug == true
+

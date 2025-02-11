@@ -1,0 +1,59 @@
+---
+- name: Check OS ( Dataiku Postgres )
+  fail: msg="Not a Red Hat based system!"
+  when: ansible_os_family != 'RedHat' or ansible_os_family != 'CentOS' or  ansible_os_family != 'Rocky'
+
+
+- name: Set facts for package name and list and network range
+  import_tasks: set-facts.yml
+  tags: install, uninstall, add, setup, remove, init, uninit
+  when: inventory_hostname in groups['postgres']
+
+
+- name: Enable Firewall
+  import_tasks: enable-firewall.yml
+  tags: enable, install
+  when: (( firewall is defined and firewall == true ) or ( postgres_all is defined and postgres_all == true )) and inventory_hostname in groups['postgres']
+
+
+- name: Install Common Prerequisties and Postgres RPM Packages For Single Instance
+  import_tasks: install-pkgs.yml
+  tags: setup, install
+  when: (( pkgs is defined and pkgs == true ) or ( postgres_all is defined and postgres_all == true )) and inventory_hostname in groups['postgres']
+
+
+- name: Initialize Postgres Instance
+  import_tasks: init-pgsql.yml
+  tags: init, install
+  when: (( pkgs is defined and pkgs == true ) or ( postgres_all is defined and postgres_all == true )) and inventory_hostname in groups['postgres']
+
+
+- name: Enable SSL for Single Postgres
+  import_tasks: enable-ssl.yml
+  tags: enable, install
+  when: (( ssl is defined and ssl == true ) or ( postgres_all is defined and postgres_all == true )) and inventory_hostname in groups['postgres']
+
+
+- name: Add User into PstgreSQL for Dataiku DSS Govern User
+  import_tasks: add-govern-users.yml
+  tags: add, install
+  when: (( user is defined and user == true ) or ( postgres_all is defined and postgres_all == true )) and inventory_hostname in groups['postgres']
+
+
+- name: Check the status of Single Postgres
+  import_tasks: check-status.yml
+  tags: install
+  when: (( user is defined and user == true ) or ( postgres_all is defined and postgres_all == true )) and inventory_hostname in groups['postgres']
+
+
+- name: Uninstall RPM Packages for Single Postgres
+  import_tasks: uninstall.yml
+  tags: uninstall
+  when: ( postgres_all is defined and postgres_all == true ) and inventory_hostname in groups['postgres']
+
+
+- name: Upgrade RPM Packages for Single Postgres
+  import_tasks: upgrade.yml
+  tags: upgrade
+  when: inventory_hostname in groups['postgres']
+

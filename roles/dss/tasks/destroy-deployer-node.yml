@@ -1,0 +1,22 @@
+---
+- name: Disable and Stop Systemd Service for Dataiku DSS Deployer Node
+  systemd:
+    daemon_reload: yes
+    name: dataiku
+    enabled: no
+    state: stopped
+  register: disable_deployer_node_systemd_service
+  ignore_errors: true
+- debug: msg={{ disable_deployer_node_systemd_service }}
+  when: print_debug == true
+
+
+- name: Delete Directory for Dataiku DSS Deployer Node
+  file:
+    path: "{{ _deployer.data_path }}"
+    state: absent
+  register: delete_data_dir
+  ignore_errors: true
+- debug: msg={{ delete_data_dir }}
+  when: print_debug == true
+
