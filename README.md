@@ -149,21 +149,21 @@ $ make dss r=uninstall s=all
 ```
 
 ## References
-#### Design Node
+### Dataiku
+##### Design Node
 - https://doc.dataiku.com/dss/latest/installation/custom/initial-install.html#rhel-compatible-distributions
-#### Deployer Node
+##### Deployer Node
 - https://doc.dataiku.com/dss/latest/installation/custom/deployer-node.html
-#### API Node
-It require license
-- https://doc.dataiku.com/dss/latest/installation/custom/api-node.html
-#### Automation Node
+##### API Node
+- https://doc.dataiku.com/dss/latest/installation/custom/api-node.html ( It require license )
+##### Automation Node
 - https://doc.dataiku.com/dss/latest/installation/custom/automation-node.html
 #### Goven Node
 - https://doc.dataiku.com/dss/latest/installation/custom/govern-node.html
 - https://doc.dataiku.com/dss/latest/governance/setup.html on Cloud Stack
 #### FM Node
 - https://knowledge.dataiku.com/latest/admin-deploying/architecture/reference-fleet-manager.html
-#### Others
+### Others
 - https://medium.com/@shamimahmed_30466/on-premise-spark-as-a-service-with-dataiku-and-kubernetes-dc26a1af773e
 - https://towardsdatascience.com/mlops-w-dataiku-dss-on-kubernetes-505ee9a2e15a
 - https://github.com/sudsk/dataiku/blob/main/README.md
