@@ -38,9 +38,6 @@ download:
 	@if [ "${*}" = "dss" ]; then\
 		ln -sf ansible-hosts-rk9-dss ansible-hosts;\
 		cat setup-temp.yml.tmp | sed -e 's/    - temp/    - ${*}/g' > setup-${*}.yml;\
-	elif [ "${*}" = "fm" ]; then\
-		ln -sf ansible-hosts-rk9-fm ansible-hosts;\
-		cat setup-temp.yml.tmp | sed -e 's/    - temp/    - ${*}/g' > setup-${*}.yml;\
 	elif [ "${*}" = "hosts" ] || [ "${*}" = "postgres" ]; then\
 		ln -sf ansible-hosts-rk9 ansible-hosts;\
 		cat setup-temp.yml.tmp | sed -e 's/    - temp/    - ${*}/g' > setup-${*}.yml;\

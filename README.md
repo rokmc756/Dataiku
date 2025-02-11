@@ -2,13 +2,16 @@
 The Dataiku Repository is Ansible Playbook to Deploy Dataiku DSS and PostgreSQL on Baremetal, Virtual Machines and Cloud Infrastructure.
 The intention of this playbook is to deploy Dataiku DSS Cluster quickly in order to reproduce or simulate issues.
 
-## Dataiku Data Science Platform
-Dataiku is a data science platform of French origin. It stands out historically for its very packaged and integrated character.
-This puts it within the reach of both experienced and novice data scientists. Thanks to its ergonomics, it allows you to create a model in a few clicks,
+## What is Dataiku DSS?
+Dataiku DSS is a data science platform of French origin. It stands out historically for its very packaged and integrated character.
+This puts it within the reach of both experienced and novice data scientists. It allows you to create a model in a few clicks,
 while industrializing the entire processing chain as a backdrop: collection, preparation of data, etc.
 
-## Dataiku DSS, What is it?
 Dataiku DSS (for Dataiku Data Science Studio) is the name of Dataiku’s AI platform.
+
+## Dataiku DSS Archiecture
+![alt text](https://raw.githubusercontent.com/rokmc756/dataiku/main/roles/dss/images/nodes-definition.png)
+
 
 ## What are the features of Dataiku?
 The Dataiku platform has around 90 functionalities that can be grouped into several major areas:
