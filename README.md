@@ -1,4 +1,23 @@
 ## Dataiku Data Science Platform
+Dataiku is a data science platform of French origin. It stands out historically for its very packaged and integrated character.
+This puts it within the reach of both experienced and novice data scientists. Thanks to its ergonomics, it allows you to create a model in a few clicks,
+while industrializing the entire processing chain as a backdrop: collection, preparation of data, etc.
+
+## Dataiku DSS, What is it?
+Dataiku DSS (for Dataiku Data Science Studio) is the name of Dataiku’s AI platform.
+
+## What are the features of Dataiku?
+The Dataiku platform has around 90 functionalities that can be grouped into several major areas:
+
+- Integration. The platform integrates with Hadoop, Spark, but also with cloud services AWS, Azure, Google Cloud. In total, the platform is equipped with more than 25 connectors.
+- Plug-ins. A gallery of more than 100 plugins allows you to benefit from third-party applications in many areas: translation, NLG, weather, recommendation engine, import/export of data…
+- Data preparation / data ops. A graphical console handles data preparation. Time series and geospatial data are supported. More than 90 prepackaged data transformers are available.
+- Development. Dataiku supports Jupyter notebooks, Python, R, Scala, SQL, Hive, Pig, Impala languages. It supports PySpark, SparkR and SparkSQL.
+- Machine Learning. The platform includes a machine learning automation engine (auto ML), a visualization console for training deep neural networks, support for Scikit-learn and XGBoost, etc.
+- Collaboration. Dataiku integrates project management, chat, wiki, versioning (via Git)…
+- Governance. The platform offers a model monitoring and auditing console, as well as a feature store.
+- The MLOps. Dataiku handles model deployment. It supports Kubernetes architectures as well as Kubernetes as a Service offerings from AWS, Azure and Google Cloud.
+- Data Visualization. A statistical visualization interface is complemented by 25 data visualization charts to identify relationships and insights within datasets.
 
 ## Supported Platform and OS
 Virtual Machines\
