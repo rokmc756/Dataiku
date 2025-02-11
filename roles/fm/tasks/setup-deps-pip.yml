@@ -1,0 +1,70 @@
+---
+- name: Install Python Setup Tools
+  become_user: "{{ _dss.user }}"
+  shell: |
+    pip3 install --upgrade setuptools
+  register: install_python_setup_tools
+  args:
+    executable: /bin/bash
+    chdir: "{{ _dss.base_path }}"
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+- debug: msg={{ install_python_setup_tools }}
+  when: print_debug == true
+
+
+- name: Set Python Setup Tools Version for Virtual Environment
+  become_user: "{{ _dss.user }}"
+  shell: |
+    pip3 install setuptools==68
+  register: set_python_setup_tools_version
+  args:
+    executable: /bin/bash
+    chdir: "{{ _dss.base_path }}"
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+- debug: msg={{ set_python_setup_tools_version }}
+  when: print_debug == true
+
+
+- name: Install Virtual Environment
+  become_user: "{{ _dss.user }}"
+  shell: |
+    pip3 install virtualenv
+  register: install_virtual_environment
+  args:
+    executable: /bin/bash
+    chdir: "{{ _dss.base_path }}"
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+- debug: msg={{ install_virtual_environment }}
+  when: print_debug == true
+
+
+- name: Upgrade Python Pip3
+  become_user: "{{ _dss.user }}"
+  shell: |
+    python3 -m pip install --upgrade pip
+  register: upgrade_python_pip3
+  args:
+    executable: /bin/bash
+    chdir: "{{ _dss.base_path }}"
+  environment:
+    PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+- debug: msg={{ upgrade_python_pip3 }}
+  when: print_debug == true
+
+
+- name: Install Virtual Environment
+  become_user: "{{ _dss.user }}"
+  shell: |
+    python3 -m virtualenv venv
+  register: install_virtual_environment
+  args:
+    executable: /bin/bash
+    chdir: "{{ _dss.base_path }}"
+  environment:
+    PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+- debug: msg={{ install_virtual_environment }}
+  when: print_debug == true
+

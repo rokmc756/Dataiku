@@ -1,0 +1,11 @@
+---
+- name: Unarchive DSS tarball
+  unarchive:
+    src: "{{ _dss.base_path }}/{{ dss_fm_file_name }}.{{ _dss.bin_type }}"
+    dest: "{{ _dss.base_path }}"
+    owner: "{{ _dss.user }}"
+    group: "{{ _dss.group }}"
+    mode: "0755"
+    remote_src: yes
+  register: unarchive_dss_tarball
+

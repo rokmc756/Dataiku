@@ -15,7 +15,13 @@
 - name: Upload Dataiku DSS Software Binary
   import_tasks: upload-dss-bin.yml
   tags: upload, install
-  when: ( bin is defined and bin == true )
+  when: ( bin is defined and bin == true ) and and inventory_hostname not in groups['fm']
+
+
+- name: Upload Dataiku DSS FM Software Binary
+  import_tasks: upload-dss-fm-bin.yml
+  tags: upload, install
+  when: ( bin is defined and bin == true ) and and inventory_hostname not in groups['fm']
 
 
 - name: Setup Dependent Pip Modules
@@ -58,6 +64,18 @@
   import_tasks: deploy-govern-node.yml
   tags: deploy, setup, install
   when: ( govern is defined and govern == true ) and inventory_hostname in groups['govern']
+
+
+- name: Deploy FM Node
+  import_tasks: deploy-fm-node.yml
+  tags: deploy, setup, install
+  when: ( fm is defined and fm == true ) and inventory_hostname in groups['fm']
+
+
+- name: Destroy FM Node
+  import_tasks: destroy-fm-node.yml
+  tags: destroy, remove, uninstall
+  when: ( fm is defined and govern == true ) and inventory_hostname in groups['fm']
 
 
 - name: Destroy Govern Node

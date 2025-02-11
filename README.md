@@ -55,23 +55,13 @@ rk9-node05 ansible_ssh_host=192.168.2.195
 
 [postgres]
 rk9-node06 ansible_ssh_host=192.168.2.196
-```
-
-#### 2) Configure hostname / ip addresses and username to run for ansible-hosts
-```yaml
-$ vi ansible-hosts-rk9-fm
-
-[all:vars]
-ssh_key_filename="id_rsa"
-remote_machine_username="jomoon"
-remote_machine_password="changeme"
-ansible_python_interpreter=/usr/bin/python3
 
 [fm]
 rk9-node07 ansible_ssh_host=192.168.2.197
+
 ```
 
-#### 3) Configure user/group, version and location to download in group_vars/all.yml
+#### 2) Configure user/group, version and location to download in group_vars/all.yml
 ```yaml
 $ vi group_vars/all.yml
 ~~ snip
@@ -99,20 +89,22 @@ _postgres:
 ~~ snip
 ```
 
-## Initialize Linux Host to Create User and SSH Keys and Exchange them among all Hosts
+### 3) Initialize Linux Host to Create User and SSH Keys and Exchange them among all Hosts
 ```
 $ make hosts r=init s=all
 
 ```
-## Download Dataiku DSS Software Binaries
+### 4) Download Dataiku DSS Software Binaries into Ansible File Directory
 ```yaml
-$ make dss r=upload s=bin
-$ make dss r=download s=bin
-$ make fm r=upload s=bin
-$ make fm r=download s=bin
+$ make download
 ```
 
-## How to Install and Deploy Dataiku DSS
+### 5) Upload Dataiku DSS Software Binaries into all Hosts
+```yaml
+$ make dss r=upload s=bin
+```
+
+### 6) How to Install and Deploy Dataiku DSS
 ```yaml
 $ make dss r=setup  s=pip
 $ make dss r=deploy s=design
@@ -122,30 +114,20 @@ $ make dss r=deploy s=automation
 
 $ make postgres r=install s=all
 $ make dss r=deploy s=govern
-
-$ make fm r=setup  s=pip
-$ make fm r=deploy s=govern
-
-# For at once
-$ make dss r=deploy s=all
+$ make dss r=deploy s=fm
 ```
 
-## How to Uninstall and Destroy Dataiku DSS
+## 7) How to Uninstall and Destroy Dataiku DSS
 ```yaml
-$ make fm r=destroy s=govern
-
+$ make dss r=destroy s=fm
 $ make dss r=destroy s=govern
+$ make postgres r=uninstall s=all
+
 $ make dss r=destroy s=automation
 $ make dss r=destroy s=api
 $ make dss r=destroy s=deployer
 $ make dss r=destroy s=design
 $ make dss r=remove s=pip
-$ make fm r=remove s=pip
-
-$ make postgres r=install s=all
-
-# For at once
-$ make dss r=uninstall s=all
 ```
 
 ## References

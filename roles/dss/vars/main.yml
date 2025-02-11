@@ -9,6 +9,7 @@ _deployer:
 _api:
   data_path: "/opt/dataiku/api/data"
   port: 8083
+  license: "changeme"
 
 _automation:
   data_path: "/opt/dataiku/automation/data"
@@ -20,5 +21,13 @@ _govern:
   pgsql:
     db_name: govern_testdb
     db_user: govern_user
+    db_password: changeme
+
+_fm:
+  data_path: "/opt/dataiku/fm/data"
+  port: 8087
+  pgsql:
+    db_name: fm_testdb
+    db_user: fm_user
     db_password: changeme
 

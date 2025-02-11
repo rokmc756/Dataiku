@@ -9,22 +9,41 @@
 
 - name: Set Facts for Installing Dataiku DSS Fleet Manager
   import_tasks: set-facts.yml
-  tags: upload, install, uninstall
+  tags: upload, install, uninstall, deploy, destroy, setup, remove
+
+
+- name: Setup Dependent Pip Modules
+  import_tasks: setup-deps-pip.yml
+  tags: setup, install
+  when: ( pip is defined and pip == true )
+
+
+- name: Remove Dependent Pip Modules
+  import_tasks: remove-deps-pip.yml
+  tags: remove, uninstall
+  when: ( pip is defined and pip == true )
 
 
 - name: Upload Dataiku DSS Fleet Manager Software Binary
   import_tasks: upload-dss-fm-bin.yml
   tags: upload
+  when: ( bin is defined and bin == true )
+
+
+- name: Setup Dataiku DSS Fleet Manager Software Binary
+  import_tasks: setup-dss-fm-bin.yml
+  tags: setup
+  when: ( bin is defined and bin == true )
 
 
 - name: Deploy Dataiku Fleet Manager Node
   import_tasks: deploy-fm-node.yml
   tags: deploy, setup, install
-  when: inventory_hostname in groups['fm']
+  when: ( fm is defined and fm == true )
 
 
 - name: Destroy Dataiku Fleet Manager Node
-  import_tasks: uninstall-fm-node.yml
+  import_tasks: destroy-fm-node.yml
   tags: destroy, remove, uninstall
-  when: inventory_hostname in groups['fm']
+  when: ( fm is defined and fm == true )
 

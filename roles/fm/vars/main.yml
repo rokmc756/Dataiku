@@ -1,4 +1,8 @@
-fm:
+_fm:
   data_path: "/opt/dataiku/fm/data"
   port: 8087
+  pgsql:
+    db_name: fm_testdb
+    db_user: fm_user
+    db_password: changeme
 

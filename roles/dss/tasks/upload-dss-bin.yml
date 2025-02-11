@@ -13,8 +13,6 @@
 - name: Sanity Check for Existence of "{{ _dss.base_path }}/{{ dss_file_name }}.{{ _dss.bin_type }}" File or "{{ _dss.base_path }}/{{ dss_file_name }}" Directory
   debug: msg="Both {{ _dss.base_path }}/{{ dss_file_name }}.{{ _dss.bin_type }} file and {{ _dss.base_path }}/{{ dss_file_name }} Directory Already Exists"
   changed_when: check_dss_tarball.stat.exists == True and check_dss_install_dir.stat.exists == True
-# fail: msg="Either {{ _dss.base_path }}/{{ dss_file_name }}.tar file or {{ _dss.base_path }}/{{ dss_file_name }} Airectory Already Exists"
-# when: check_dss_tarball.stat.exists == True or check_dss_install_dir.stat.exists == True
 
 
 - name: Copy DSS Tarball from Local Directory, roles/dss/files
@@ -23,52 +21,24 @@
   when: _dss.download == false and check_dss_tarball.stat.exists != True
 
 
-- name: Download DSS Software Binaries and Save the into Ansible Files Directory
+- name: Download DSS Software Binaries
   get_url:
     url: "{{ item.url }}"
     dest: "{{ item.dest }}"
   with_items:
     - { url: "{{ _dss.download_url }}/{{ dss_version }}/{{ dss_file_name }}.{{ _dss.bin_type }}",
-        dest: "{{ _dss.base_path }}/{{ dss_version }}/{{ dss_file_name }}.{{ _dss.bin_type }}" }
+        dest: "{{ _dss.base_path }}/{{ dss_file_name }}.{{ _dss.bin_type }}" }
   when: _dss.download == true and check_dss_tarball.stat.exists != True
-
-
-#- name: Download DSS Tarball File
-#  shell: |
-#    wget -P {{ _dss.base_path }} --show-progress --auth-no-challenge https://CHANGEME_dss_TOKEN:@{{ _dss.download_url }}/{{ dss_file_name }}.{{ _dss.bin_type }}
-#  register: download_dss_tarball
-#  when: _dss.download == true and dss_tarball_exists.stat.exists == false
-#  wget https://cdn.downloads.dataiku.com/public/dss/13.3.2/dataiku-dss-13.3.2.tar.gz
-
-
-# https://xxxxxxxxxxxxxxxx:@get.dss.io/dist/v1/pkg/{{ dss_file_name }}.{{ _dss.bin_type }}
-#- name: Download dss tarball file
-#  get_url:
-#    url: "{{ server_url }}"
-#    dest: "{{ _dss.base_path }}/{{ dss_file_name }}.{{ _dss.bin_type }}"
-#    owner: root
-#    group: root
-#    mode: 0755
-#  when: _dss.download == true and dss_tarball_exists.stat.exists == false
 
 
 - name: Unarchive DSS tarball
   unarchive:
     src: "{{ _dss.base_path }}/{{ dss_file_name }}.{{ _dss.bin_type }}"
     dest: "{{ _dss.base_path }}"
-    #  /{{ dss_file_name }}"
     owner: "{{ _dss.user }}"
     group: "{{ _dss.group }}"
     mode: "0755"
     remote_src: yes
   register: unarchive_dss_tarball
   when: check_dss_install_dir.stat.exists == false
-
-
-#- name: Create symbolic link for DSS directory
-#  file:
-#   src: "{{ _dss.base_path }}/{{ dss_tools_file_name }}"
-#   dest: "{{ _dss.base_path }}/{{ _dss.tools.name }}"
-#   state: link
-#   force: true
 

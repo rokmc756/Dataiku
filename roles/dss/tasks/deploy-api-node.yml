@@ -14,7 +14,7 @@
 - name: Install Dataiku DSS API Node
   become_user: "{{ _dss.user }}"
   shell: |
-    dataiku-dss-{{ _dss.major_version }}.{{ _dss.minor_version }}.{{ _dss.patch_version }}/installer.sh -t api -d {{ _api.data_path }} -p {{ _api.port }} # -l LICENSE_FILE]
+    dataiku-dss-{{ _dss.major_version }}.{{ _dss.minor_version }}.{{ _dss.patch_version }}/installer.sh -t api -d {{ _api.data_path }} -p {{ _api.port }} # -l "{{ _api.license }}" LICENSE_FILE
   register: install_dss_api_node
   args:
     chdir: "{{ _dss.base_path }}"
