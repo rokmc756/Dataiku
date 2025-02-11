@@ -29,12 +29,12 @@ The Dataiku platform has around 90 functionalities that can be grouped into seve
 ## Supported Platform and OS
 Virtual Machines\
 Baremetal\
-RHEL and CentOS 9 and Rocky Linux 9.x\
+RHEL and CentOS 9 and Rocky Linux 9.x
 
 
 ## Prerequisite for ansible host
 MacOS or Windows Linux Subsysetm or Many kind of Linux Distributions should have ansible as ansible host.\
-Supported OS for ansible target host should be prepared with package repository configured such as yum, dnf and apt as well as zypper\
+Supported OS for ansible target host should be prepared with package repository configured such as yum, dnf and apt as well as zypper
 
 
 ## Prepare ansible host to run this Ansible Playbook
