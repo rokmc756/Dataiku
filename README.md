@@ -37,7 +37,7 @@ MacOS or Windows Linux Subsysetm or Many kind of Linux Distributions should have
 Supported OS for ansible target host should be prepared with package repository configured such as yum, dnf and apt as well as zypper\
 
 
-## Prepare ansible host to run KubeFarmer
+## Prepare ansible host to run this Ansible Playbook
 * MacOS
 ```
 $ xcode-select --install
@@ -52,7 +52,7 @@ $ apt install ansible
 $ zypper install ansible
 ```
 
-## How to Configure ansible-hosts, role/dss/var/main.yml to deploy Dataiku DSS
+## How to Configure Inventory and Variables
 #### 1) Configure hostname / ip addresses and username to run for ansible-hosts
 ```yaml
 $ vi ansible-hosts-rk9-dss
@@ -115,22 +115,23 @@ _postgres:
 ~~ snip
 ```
 
-### 3) Initialize Linux Host to Create User and SSH Keys and Exchange them among all Hosts
+## How to deploy Dataiku DSS
+### 1) Initialize Linux Host to Create User and SSH Keys and Exchange them among all Hosts
 ```
 $ make hosts r=init s=all
 
 ```
-### 4) Download Dataiku DSS Software Binaries into Ansible File Directory
+### 2) Download Dataiku DSS Software Binaries into Ansible File Directory
 ```yaml
 $ make download
 ```
 
-### 5) Upload Dataiku DSS Software Binaries into all Hosts
+### 3) Upload Dataiku DSS Software Binaries into all Hosts
 ```yaml
 $ make dss r=upload s=bin
 ```
 
-### 6) How to Install and Deploy Dataiku DSS
+### 4) How to Install and Deploy Dataiku DSS
 ```yaml
 $ make dss r=setup  s=pip
 $ make dss r=deploy s=design
@@ -143,7 +144,7 @@ $ make dss r=deploy s=govern
 $ make dss r=deploy s=fm
 ```
 
-## 7) How to Uninstall and Destroy Dataiku DSS
+### 5) How to Uninstall and Destroy Dataiku DSS
 ```yaml
 $ make dss r=destroy s=fm
 $ make dss r=destroy s=govern
